@@ -27,7 +27,6 @@ public class CalendarActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         CalendarView calendarView = new CalendarView(getApplicationContext());
-
 	    setContentView(calendarView);
     }
 }

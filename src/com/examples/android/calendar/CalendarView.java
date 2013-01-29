@@ -20,11 +20,12 @@ import android.content.Context;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.widget.GridView;
-import android.widget.LinearLayout;
+import android.view.View;
+import android.widget.*;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Random;
 
 
 public class CalendarView extends LinearLayout {
@@ -61,14 +62,14 @@ public class CalendarView extends LinearLayout {
 	    
 	    GridView gridview = (GridView) findViewById(R.id.gridview);
 	    gridview.setAdapter(adapter);
-/*
+
 	    handler = new Handler();
-	    handler.post(calendarUpdater);*/
+	    handler.post(calendarUpdater);
 
         //TODO
-        //month.set(2012, 06, 23);
+        month.set(2012, 06, 23);
 
-        /*
+
 
 	    TextView title  = (TextView) findViewById(R.id.title);
 	    title.setText(android.text.format.DateFormat.format("MMMM yyyy", month));
@@ -102,7 +103,7 @@ public class CalendarView extends LinearLayout {
 			}
 		});
 	    
-		gridview.setOnItemClickListener(new OnItemClickListener() {
+		gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 		    public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 
 		    	TextView date = (TextView)v.findViewById(R.id.date);
@@ -113,10 +114,10 @@ public class CalendarView extends LinearLayout {
 		        }
 		        
 		    }
-		});*/
+		});
     }
 	
-/*	public void refreshCalendar()
+	public void refreshCalendar()
 	{
 		TextView title  = (TextView) findViewById(R.id.title);
 		
@@ -146,5 +147,5 @@ public class CalendarView extends LinearLayout {
 			adapter.setItems(items);
 			adapter.notifyDataSetChanged();
 		}
-	};*/
+	};
 }
