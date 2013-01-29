@@ -19,6 +19,7 @@ package com.examples.android.calendar;
 import android.content.Context;
 import android.os.Handler;
 import android.util.AttributeSet;
+import android.widget.GridView;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
@@ -45,20 +46,15 @@ public class CalendarView extends LinearLayout {
     protected void onFinishInflate() {
         super.onFinishInflate();
 
-/*        LayoutInflater li = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-        li.inflate(R.layout.calendar, this, true);*/
-
-
         month = Calendar.getInstance();
 
-/*
+
 	    items = new ArrayList<String>();
 	    adapter = new CalendarAdapter(getContext(), month);
 	    
 	    GridView gridview = (GridView) findViewById(R.id.gridview);
 	    gridview.setAdapter(adapter);
-	    
+/*
 	    handler = new Handler();
 	    handler.post(calendarUpdater);*/
 

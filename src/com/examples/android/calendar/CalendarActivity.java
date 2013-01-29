@@ -26,8 +26,8 @@ public class CalendarActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        CalendarView calendarView = new CalendarView(getApplicationContext());
+        //CalendarView calendarView = new CalendarView(getApplicationContext());
 
-	    setContentView(calendarView);
+	    setContentView(R.layout.calendar);
     }
 }
