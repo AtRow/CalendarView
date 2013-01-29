@@ -17,24 +17,131 @@
 package com.examples.android.calendar;
 
 import android.content.Context;
-import android.view.LayoutInflater;
+import android.os.Handler;
+import android.util.AttributeSet;
 import android.widget.LinearLayout;
+
+import java.util.ArrayList;
+import java.util.Calendar;
 
 
 public class CalendarView extends LinearLayout {
 
+    public Calendar month;
+    public CalendarAdapter adapter;
+    public Handler handler;
+    public ArrayList<String> items; // container to store some random calendar items
+
     public CalendarView(Context context) {
         super(context);
+    }
 
-        init();
+    public CalendarView(Context context, AttributeSet attrs) {
+        super(context, attrs);
     }
 
 
-    public void init() {
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
 
-        LayoutInflater li = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+/*        LayoutInflater li = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        li.inflate(R.layout.calendar, this, true);
+        li.inflate(R.layout.calendar, this, true);*/
 
+
+        month = Calendar.getInstance();
+
+/*
+	    items = new ArrayList<String>();
+	    adapter = new CalendarAdapter(getContext(), month);
+	    
+	    GridView gridview = (GridView) findViewById(R.id.gridview);
+	    gridview.setAdapter(adapter);
+	    
+	    handler = new Handler();
+	    handler.post(calendarUpdater);*/
+
+        //TODO
+        //month.set(2012, 06, 23);
+
+        /*
+
+	    TextView title  = (TextView) findViewById(R.id.title);
+	    title.setText(android.text.format.DateFormat.format("MMMM yyyy", month));
+
+	    TextView previous  = (TextView) findViewById(R.id.previous);
+	    previous.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				if(month.get(Calendar.MONTH)== month.getActualMinimum(Calendar.MONTH)) {				
+					month.set((month.get(Calendar.YEAR)-1),month.getActualMaximum(Calendar.MONTH),1);
+				} else {
+					month.set(Calendar.MONTH,month.get(Calendar.MONTH)-1);
+				}
+				refreshCalendar();
+			}
+		});
+	    
+	    TextView next  = (TextView) findViewById(R.id.next);
+	    next.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				if(month.get(Calendar.MONTH)== month.getActualMaximum(Calendar.MONTH)) {				
+					month.set((month.get(Calendar.YEAR)+1),month.getActualMinimum(Calendar.MONTH),1);
+				} else {
+					month.set(Calendar.MONTH,month.get(Calendar.MONTH)+1);
+				}
+				refreshCalendar();
+				
+			}
+		});
+	    
+		gridview.setOnItemClickListener(new OnItemClickListener() {
+		    public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+
+		    	TextView date = (TextView)v.findViewById(R.id.date);
+		        if(date instanceof TextView && !date.getText().equals("")) {
+		        	
+		        	String day = "Selected: " + date.getText().toString();
+                    Toast.makeText(getContext(), day, Toast.LENGTH_LONG).show();
+		        }
+		        
+		    }
+		});*/
     }
+	
+/*	public void refreshCalendar()
+	{
+		TextView title  = (TextView) findViewById(R.id.title);
+		
+		adapter.refreshDays();
+		adapter.notifyDataSetChanged();				
+		handler.post(calendarUpdater); // generate some random calendar items				
+		
+		title.setText(android.text.format.DateFormat.format("MMMM yyyy", month));
+	}
+	
+
+	public Runnable calendarUpdater = new Runnable() {
+
+		@Override
+		public void run() {
+			items.clear();
+			// format random values. You can implement a dedicated class to provide real values
+			for(int i=0;i<31;i++) {
+				Random r = new Random();
+
+				if(r.nextInt(10)>6)
+				{
+					items.add(Integer.toString(i));
+				}
+			}
+
+			adapter.setItems(items);
+			adapter.notifyDataSetChanged();
+		}
+	};*/
 }

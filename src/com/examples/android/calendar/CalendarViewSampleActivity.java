@@ -43,7 +43,7 @@ public class CalendarViewSampleActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				DatePicker dp = (DatePicker)findViewById(R.id.datePicker1);
-				Intent intent = new Intent(v.getContext(),CalendarView_DEL.class);
+				Intent intent = new Intent(v.getContext(), CalendarActivity.class);
 				
 	    		intent.putExtra("date", dp.getYear()+"-"+dp.getMonth()+"-"+dp.getDayOfMonth());
 	    		startActivityForResult(intent, PICK_DATE_REQUEST);				
