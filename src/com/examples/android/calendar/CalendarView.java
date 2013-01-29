@@ -103,7 +103,7 @@ public class CalendarView extends LinearLayout {
 			}
 		});
 	    
-		gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+/*		gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 		    public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 
 		    	TextView date = (TextView)v.findViewById(R.id.date);
@@ -114,7 +114,7 @@ public class CalendarView extends LinearLayout {
 		        }
 		        
 		    }
-		});
+		});*/
     }
 	
 	public void refreshCalendar()
