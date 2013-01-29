@@ -19,6 +19,7 @@ package com.examples.android.calendar;
 import android.content.Context;
 import android.os.Handler;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 
@@ -35,16 +36,22 @@ public class CalendarView extends LinearLayout {
 
     public CalendarView(Context context) {
         super(context);
+        init();
     }
 
     public CalendarView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        init();
     }
 
+    private void init() {
+        LayoutInflater li = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        li.inflate(R.layout.calendar, this, true);
+    }
 
     @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
 
         month = Calendar.getInstance();
 
