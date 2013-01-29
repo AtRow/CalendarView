@@ -16,25 +16,17 @@
 
 package com.examples.android.calendar;
 
-import android.content.Context;
-import android.view.LayoutInflater;
-import android.widget.LinearLayout;
+import android.app.Activity;
+import android.os.Bundle;
 
 
-public class CalendarView extends LinearLayout {
-
-    public CalendarView(Context context) {
-        super(context);
-
-        init();
-    }
+public class CalendarActivity extends Activity {
 
 
-    public void init() {
+	public void onCreate(Bundle savedInstanceState) {
 
-        LayoutInflater li = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        CalendarView_DEL calendarView = new CalendarView_DEL(getApplicationContext());
 
-        li.inflate(R.layout.calendar, this, true);
-
+	    setContentView(calendarView);
     }
 }
