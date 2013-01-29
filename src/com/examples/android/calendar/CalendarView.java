@@ -16,48 +16,64 @@
 
 package com.examples.android.calendar;
 
+import android.content.Context;
+import android.os.Handler;
+import android.util.AttributeSet;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.*;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Random;
 
 
-import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
-import android.os.Handler;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.GridView;
-import android.widget.TextView;
+public class CalendarView extends LinearLayout {
+
+    public Calendar month;
+    public CalendarAdapter adapter;
+    public Handler handler;
+    public ArrayList<String> items; // container to store some random calendar items
+
+    public CalendarView(Context context) {
+        super(context);
+        init();
+    }
+
+    public CalendarView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init();
+    }
+
+    private void init() {
+        LayoutInflater li = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        li.inflate(R.layout.calendar, this, true);
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+
+        month = Calendar.getInstance();
 
 
-public class CalendarView extends Activity {
-
-	public Calendar month;
-	public CalendarAdapter adapter;
-	public Handler handler;
-	public ArrayList<String> items; // container to store some random calendar items
-	
-	public void onCreate(Bundle savedInstanceState) {
-	    super.onCreate(savedInstanceState);
-	    setContentView(R.layout.calendar);
-	    month = Calendar.getInstance();
-	    onNewIntent(getIntent());
-	    
 	    items = new ArrayList<String>();
-	    adapter = new CalendarAdapter(this, month);
+	    adapter = new CalendarAdapter(getContext(), month);
 	    
 	    GridView gridview = (GridView) findViewById(R.id.gridview);
 	    gridview.setAdapter(adapter);
-	    
+
 	    handler = new Handler();
 	    handler.post(calendarUpdater);
-	    
+
+        //TODO
+        month.set(2012, 06, 23);
+
+
+
 	    TextView title  = (TextView) findViewById(R.id.title);
 	    title.setText(android.text.format.DateFormat.format("MMMM yyyy", month));
-	    
+
 	    TextView previous  = (TextView) findViewById(R.id.previous);
 	    previous.setOnClickListener(new OnClickListener() {
 			
@@ -87,25 +103,19 @@ public class CalendarView extends Activity {
 			}
 		});
 	    
-		gridview.setOnItemClickListener(new OnItemClickListener() {
+		gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 		    public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+
 		    	TextView date = (TextView)v.findViewById(R.id.date);
 		        if(date instanceof TextView && !date.getText().equals("")) {
 		        	
-		        	Intent intent = new Intent();
-		        	String day = date.getText().toString();
-		        	if(day.length()==1) {
-		        		day = "0"+day;
-		        	}
-		        	// return chosen date as string format 
-		        	intent.putExtra("date", android.text.format.DateFormat.format("yyyy-MM", month)+"-"+day);
-		        	setResult(RESULT_OK, intent);
-		        	finish();
+		        	String day = "Selected: " + date.getText().toString();
+                    Toast.makeText(getContext(), day, Toast.LENGTH_LONG).show();
 		        }
 		        
 		    }
 		});
-	}
+    }
 	
 	public void refreshCalendar()
 	{
@@ -118,21 +128,16 @@ public class CalendarView extends Activity {
 		title.setText(android.text.format.DateFormat.format("MMMM yyyy", month));
 	}
 	
-	public void onNewIntent(Intent intent) {
-		String date = intent.getStringExtra("date");
-		String[] dateArr = date.split("-"); // date format is yyyy-mm-dd
-		month.set(Integer.parseInt(dateArr[0]), Integer.parseInt(dateArr[1]), Integer.parseInt(dateArr[2]));
-	}
-	
+
 	public Runnable calendarUpdater = new Runnable() {
-		
+
 		@Override
 		public void run() {
 			items.clear();
 			// format random values. You can implement a dedicated class to provide real values
 			for(int i=0;i<31;i++) {
 				Random r = new Random();
-				
+
 				if(r.nextInt(10)>6)
 				{
 					items.add(Integer.toString(i));

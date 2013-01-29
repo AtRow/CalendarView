@@ -39,7 +39,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.examples.android.calendar.CalendarView"></activity>
+        <activity android:name=".CalendarActivity"></activity>
 
     </application>
 
