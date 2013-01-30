@@ -25,7 +25,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.Calendar;
 import java.util.Map;
 
 public class CalendarAdapter extends BaseAdapter {
@@ -41,16 +40,12 @@ public class CalendarAdapter extends BaseAdapter {
     private int offset;
 
 
-    public CalendarAdapter(Context context, Calendar monthCalendar, int firstDayOfWeek) {
+    public CalendarAdapter(Context context, Time time, int firstDayOfWeek) {
 
         this.context = context;
         this.firstDayOfWeek = firstDayOfWeek;
 
-        currentDate = new Time();
-        currentDate.year = monthCalendar.get(Calendar.YEAR);
-        currentDate.month = monthCalendar.get(Calendar.MONTH);
-        currentDate.monthDay = monthCalendar.get(Calendar.DAY_OF_MONTH);
-        currentDate.normalize(false);
+        currentDate = new Time(time);
 
         refreshDays();
     }

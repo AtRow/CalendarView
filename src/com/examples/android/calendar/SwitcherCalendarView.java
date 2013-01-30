@@ -17,6 +17,7 @@
 package com.examples.android.calendar;
 
 import android.content.Context;
+import android.text.format.Time;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.FrameLayout;
@@ -44,10 +45,19 @@ public class SwitcherCalendarView extends FrameLayout implements RealViewSwitche
         switcher = new RealViewSwitcher(getContext());
         switcher.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 
+        Time time = new Time();
+        time.setToNow();
+        time.month--;
+
         calendarViews = new CalendarView[3];
 
         for (int i = 0; i < 3; i++) {
             calendarViews[i] = new CalendarView(getContext());
+
+            time.normalize(false);
+            calendarViews[i].setDate(time);
+            time.month++;
+
             switcher.addView(calendarViews[i]);
         }
 
@@ -68,7 +78,7 @@ public class SwitcherCalendarView extends FrameLayout implements RealViewSwitche
 
         CalendarView selectedView = calendarViews[i];
 
-        String day = android.text.format.DateFormat.format("dd MMMM yyyy", selectedView.month).toString();
+        String day = selectedView.getDate().format("%Y.%m.%d %H:%M:%S");
 
         String msg = "Selected: " + day;
         Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();

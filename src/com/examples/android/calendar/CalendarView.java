@@ -25,8 +25,6 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Map;
 
 
@@ -35,12 +33,13 @@ public class CalendarView extends FrameLayout {
     //static final int FIRST_DAY_OF_WEEK = Time.SUNDAY;
     static final int FIRST_DAY_OF_WEEK = Time.MONDAY;
 
-    public Time time;
+    private Time time;
 
-    public Calendar month;
-    public CalendarAdapter adapter;
-    public Handler handler;
-    public Map<Integer, DayInfo> items; // container to store some random calendar items
+    private CalendarGridView gridView;
+
+    private CalendarAdapter adapter;
+    private Handler handler;
+    private Map<Integer, DayInfo> items; // container to store some random calendar items
 
     public CalendarView(Context context) {
         super(context);
@@ -56,8 +55,22 @@ public class CalendarView extends FrameLayout {
         LayoutInflater li = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         li.inflate(R.layout.calendar, this, true);
 
-        time = new Time();
-        time.setToNow();
+        gridView = (CalendarGridView) findViewById(R.id.gridview);
+    }
+
+
+    public Time getDate() {
+        return time;
+    }
+
+    public void setDate(Time time) {
+        this.time = new Time(time);
+
+        if (time != null) {
+            adapter = new CalendarAdapter(getContext(), time, FIRST_DAY_OF_WEEK);
+            gridView.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
+        }
 
     }
 
@@ -65,21 +78,7 @@ public class CalendarView extends FrameLayout {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
 
-        month = Calendar.getInstance();
-        //TODO
-        month.set(2013, 0, 23);
-
-	    adapter = new CalendarAdapter(getContext(), month, FIRST_DAY_OF_WEEK);
-	    
-	    CalendarGridView gridView = (CalendarGridView) findViewById(R.id.gridview);
-	    gridView.setAdapter(adapter);
-
-	    handler = new Handler();
-	    handler.post(calendarUpdater);
-
-
-
-
+/*
 
 	    TextView title  = (TextView) findViewById(R.id.title);
 	    title.setText(android.text.format.DateFormat.format("MMMM yyyy", month));
@@ -113,6 +112,7 @@ public class CalendarView extends FrameLayout {
 			}
 		});
 
+*/
         gridView.setOnChildClickListener(new CalendarGridView.OnChildClickListener() {
             @Override
             public void onChildClick(View child) {
@@ -126,14 +126,15 @@ public class CalendarView extends FrameLayout {
                     //Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
 
                     int day = Integer.parseInt(date.getText().toString());
-                    month.set(Calendar.DAY_OF_MONTH, day);
+                    time.monthDay = day;
                 }
             }
         });
 	    
     }
+
 	
-	public void refreshCalendar()
+/*	public void refreshCalendar()
 	{
 		TextView title  = (TextView) findViewById(R.id.title);
 		
@@ -150,7 +151,7 @@ public class CalendarView extends FrameLayout {
 		@Override
 		public void run() {
 			items = new HashMap<Integer, DayInfo>();
-/*			// format random values. You can implement a dedicated class to provide real values
+*//*			// format random values. You can implement a dedicated class to provide real values
 			for(int i=0;i<31;i++) {
 				Random r = new Random();
 
@@ -158,7 +159,7 @@ public class CalendarView extends FrameLayout {
 				{
 					items.put(i, new DayInfo());
 				}
-			}*/
+			}*//*
 
             items.put(1, new DayInfo());
             items.put(2, new DayInfo());
@@ -172,5 +173,5 @@ public class CalendarView extends FrameLayout {
 			adapter.setItems(items);
 			adapter.notifyDataSetChanged();
 		}
-	};
+	};*/
 }
