@@ -18,10 +18,12 @@ package com.examples.android.calendar;
 
 import android.content.Context;
 import android.os.Handler;
+import android.text.format.Time;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.*;
+import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -29,6 +31,11 @@ import java.util.Random;
 
 
 public class CalendarView extends FrameLayout {
+
+    static final int FIRST_DAY_OF_WEEK = Time.SUNDAY;
+    //static final int FIRST_DAY_OF_WEEK = Time.MONDAY;
+
+    public Time time;
 
     public Calendar month;
     public CalendarAdapter adapter;
@@ -48,6 +55,10 @@ public class CalendarView extends FrameLayout {
     private void init() {
         LayoutInflater li = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         li.inflate(R.layout.calendar, this, true);
+
+        time = new Time();
+        time.setToNow();
+
     }
 
     @Override
@@ -55,10 +66,11 @@ public class CalendarView extends FrameLayout {
         super.onAttachedToWindow();
 
         month = Calendar.getInstance();
+        //TODO
+        month.set(2013, 0, 23);
 
-
-	    items = new ArrayList<String>();
-	    adapter = new CalendarAdapter(getContext(), month);
+        items = new ArrayList<String>();
+	    adapter = new CalendarAdapter(getContext(), month, FIRST_DAY_OF_WEEK);
 	    
 	    CalendarGridView gridView = (CalendarGridView) findViewById(R.id.gridview);
 	    gridView.setAdapter(adapter);
@@ -66,8 +78,7 @@ public class CalendarView extends FrameLayout {
 	    handler = new Handler();
 	    handler.post(calendarUpdater);
 
-        //TODO
-        month.set(2012, 06, 23);
+
 
 
 

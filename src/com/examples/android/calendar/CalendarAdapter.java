@@ -16,35 +16,41 @@
 
 package com.examples.android.calendar;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-
-
-
 import android.content.Context;
+import android.text.format.Time;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-public class CalendarAdapter extends BaseAdapter {
-	static final int FIRST_DAY_OF_WEEK =0; // Sunday = 0, Monday = 1
-	
-	
-	private Context mContext;
+import java.util.ArrayList;
+import java.util.Calendar;
 
-    private java.util.Calendar month;
-    private Calendar selectedDate;
+public class CalendarAdapter extends BaseAdapter {
+
+    private Time currentDate;
+
+    private int firstDayOfWeek;
+	
+	private Context context;
+
     private ArrayList<String> items;
-    
-    public CalendarAdapter(Context c, Calendar monthCalendar) {
-    	month = monthCalendar;
-    	selectedDate = (Calendar)monthCalendar.clone();
-    	mContext = c;
-        month.set(Calendar.DAY_OF_MONTH, 1);
+
+    private DayTile[] dayTiles;
+
+
+    public CalendarAdapter(Context context, Calendar monthCalendar, int firstDayOfWeek) {
+
+        this.context = context;
+        this.firstDayOfWeek = firstDayOfWeek;
+
+        currentDate = new Time();
+        currentDate.year = monthCalendar.get(Calendar.YEAR);
+        currentDate.month = monthCalendar.get(Calendar.MONTH);
+        currentDate.monthDay = monthCalendar.get(Calendar.DAY_OF_MONTH);
+        currentDate.normalize(false);
+
         this.items = new ArrayList<String>();
         refreshDays();
     }
@@ -57,47 +63,52 @@ public class CalendarAdapter extends BaseAdapter {
     	}
     	this.items = items;
     }
-    
 
+    @Override
     public int getCount() {
-        return days.length;
+        return dayTiles.length;
     }
 
+    @Override
     public Object getItem(int position) {
         return null;
     }
 
+    @Override
     public long getItemId(int position) {
         return 0;
     }
 
     // create a new view for each item referenced by the Adapter
+    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+
+        DayTile tile = dayTiles[position];
+
         View v = convertView;
     	TextView dayView;
         if (convertView == null) {  // if it's not recycled, initialize some attributes
-        	LayoutInflater vi = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        	LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v = vi.inflate(R.layout.calendar_item, null);
         	
         }
         dayView = (TextView)v.findViewById(R.id.date);
         
-        // disable empty days from the beginning
-        if(days[position].equals("")) {
-        	dayView.setClickable(false);
-        	dayView.setFocusable(false);
+        if(tile.containsDay) {
+            // mark current day as focused
+            if(tile.isCurrentDay) {
+                v.setBackgroundResource(R.drawable.item_background_focused);
+            }
+            else {
+                v.setBackgroundResource(R.drawable.list_item_background);
+            }
+        } else {
+            // disable empty days from the beginning
+            v.setVisibility(View.INVISIBLE);
         }
-        else {
-        	// mark current day as focused
-        	if(month.get(Calendar.YEAR)== selectedDate.get(Calendar.YEAR) && month.get(Calendar.MONTH)== selectedDate.get(Calendar.MONTH) && days[position].equals(""+selectedDate.get(Calendar.DAY_OF_MONTH))) {
-        		v.setBackgroundResource(R.drawable.item_background_focused);
-        	}
-        	else {
-        		v.setBackgroundResource(R.drawable.list_item_background);
-        	}
-        }
-        dayView.setText(days[position]);
-        
+
+        dayView.setText(Integer.toString(tile.getMonthDay()));
+/*
         // create date string for comparison
         String date = days[position];
     	
@@ -117,48 +128,41 @@ public class CalendarAdapter extends BaseAdapter {
         else {
         	iw.setVisibility(View.INVISIBLE);
         }
+        */
         return v;
     }
     
-    public void refreshDays()
-    {
+    public void refreshDays() {
     	// clear items
     	items.clear();
-    	
-    	int lastDay = month.getActualMaximum(Calendar.DAY_OF_MONTH);
-        int firstDay = (int)month.get(Calendar.DAY_OF_WEEK);
-        
-        // figure size of the array
-        if(firstDay==1){
-        	days = new String[lastDay+(FIRST_DAY_OF_WEEK*6)];
+
+        Time counter = new Time(currentDate);
+
+        counter.monthDay = 1;
+        counter.normalize(false);
+
+        int weekDayOn1st = counter.weekDay;
+        int daysInMonth = counter.getActualMaximum(Time.MONTH_DAY);
+
+        int emptyTilesCount = weekDayOn1st - firstDayOfWeek;
+        int fullLength = emptyTilesCount + daysInMonth;
+
+        dayTiles = new DayTile[emptyTilesCount + daysInMonth];
+
+        // At first, fill with empty
+        for (int i = 0; i < emptyTilesCount; i++) {
+            dayTiles[i] = new DayTile();
         }
-        else {
-        	days = new String[lastDay+firstDay-(FIRST_DAY_OF_WEEK+1)];
-        }
-        
-        int j=FIRST_DAY_OF_WEEK;
-        
-        // populate empty days before first real day
-        if(firstDay>1) {
-	        for(j=0;j<firstDay-FIRST_DAY_OF_WEEK;j++) {
-	        	days[j] = "";
-	        }
-        }
-	    else {
-	    	for(j=0;j<FIRST_DAY_OF_WEEK*6;j++) {
-	        	days[j] = "";
-	        }
-	    	j=FIRST_DAY_OF_WEEK*6+1; // sunday => 1, monday => 7
-	    }
-        
-        // populate days
-        int dayNumber = 1;
-        for(int i=j-1;i<days.length;i++) {
-        	days[i] = ""+dayNumber;
-        	dayNumber++;
+
+        // Rest with values
+        for (int i = emptyTilesCount; i < fullLength; i++) {
+            dayTiles[i] = new DayTile(counter);
+
+            if (currentDate.monthDay == counter.monthDay) {
+                dayTiles[i].isCurrentDay = true;
+            }
+            counter.monthDay++;
         }
     }
 
-    // references to our items
-    public String[] days;
 }
