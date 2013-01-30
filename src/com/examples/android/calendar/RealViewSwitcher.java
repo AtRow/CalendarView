@@ -20,6 +20,7 @@ package com.examples.android.calendar;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -30,7 +31,9 @@ import android.widget.Scroller;
 /**
  * RealViewSwitcher allows users to switch between multiple screens (layouts) in the same way as the Android home screen (Launcher application).
  * <p>
- * You can add and remove views using the normal methods {@link android.view.ViewGroup#addView(android.view.View)}, {@link android.view.ViewGroup#removeView(android.view.View)} etc. You may want to listen for updates by calling {@link com.exina.android.calendar.RealViewSwitcher#setOnScreenSwitchListener(com.exina.android.calendar.RealViewSwitcher.OnScreenSwitchListener)}
+ * You can add and remove views using the normal methods {@link android.view.ViewGroup#addView(android.view.View)},
+ * {@link android.view.ViewGroup#removeView(android.view.View)} etc. You may want to listen for updates by calling
+ * {@link com.examples.android.calendar.RealViewSwitcher#setOnScreenSwitchListener(com.examples.android.calendar.RealViewSwitcher.OnScreenSwitchListener)}
  * in order to perform operations once a new screen has been selected.
  * 
  * @author Marc Reichelt, <a href="http://www.marcreichelt.de/">http://www.marcreichelt.de/</a>
@@ -57,6 +60,10 @@ public class RealViewSwitcher extends ViewGroup {
 
 	}
 
+    public static interface OnSingleClickListener {
+        void onSingleClick();
+    }
+
 	private static final int SNAP_VELOCITY = 1000;
 	private static final int INVALID_SCREEN = -1;
 
@@ -74,9 +81,13 @@ public class RealViewSwitcher extends ViewGroup {
 	private int mCurrentScreen;
 	private int mNextScreen = INVALID_SCREEN;
 
+    private boolean mSingleDown = false;
+    private boolean mSingleUp = false;
+
 	private boolean mFirstLayout = true;
 
 	private OnScreenSwitchListener mOnScreenSwitchListener;
+    private OnSingleClickListener mOnSingleClickListener;
 
 	public RealViewSwitcher(Context context) {
 		super(context);
@@ -152,6 +163,9 @@ public class RealViewSwitcher extends ViewGroup {
 
 		switch (action) {
 		case MotionEvent.ACTION_DOWN:
+
+            Log.w("RVS", "Got ACTION_DOWN");
+
 			/*
 			 * If being flinged and user touches, stop the fling. isFinished will be false if being flinged.
 			 */
@@ -164,9 +178,20 @@ public class RealViewSwitcher extends ViewGroup {
 
 			mTouchState = mScroller.isFinished() ? TOUCH_STATE_REST : TOUCH_STATE_SCROLLING;
 
+            if (mScroller.isFinished()) {
+                mSingleDown = true;
+                Log.w("RVS", "mSingleDown = true");
+            }
+
 			break;
 
 		case MotionEvent.ACTION_MOVE:
+
+            Log.w("RVS", "Got ACTION_MOVE, all False");
+
+            mSingleDown = false;
+            mSingleUp = false;
+
 			final int xDiff = (int) Math.abs(x - mLastMotionX);
 
 			boolean xMoved = xDiff > mTouchSlop;
@@ -196,6 +221,9 @@ public class RealViewSwitcher extends ViewGroup {
 			break;
 
 		case MotionEvent.ACTION_UP:
+
+            Log.w("RVS", "Got ACTION_UP");
+
 			if (mTouchState == TOUCH_STATE_SCROLLING) {
 				final VelocityTracker velocityTracker = mVelocityTracker;
 				velocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
@@ -217,12 +245,31 @@ public class RealViewSwitcher extends ViewGroup {
 				}
 			}
 
+            if (mTouchState != TOUCH_STATE_SCROLLING) {
+                Log.w("RVS", "mSingleUp = true");
+                mSingleUp = true;
+            }
+
 			mTouchState = TOUCH_STATE_REST;
 
 			break;
+
 		case MotionEvent.ACTION_CANCEL:
+            Log.w("RVS", "Got ACTION_CANCEL, all False");
+
 			mTouchState = TOUCH_STATE_REST;
+
+            mSingleDown = false;
+            mSingleUp = false;
 		}
+
+        if (mSingleUp && mSingleDown && (mOnSingleClickListener != null)) {
+            Log.w("RVS", "Got Single Click");
+            mSingleDown = false;
+            mSingleUp = false;
+
+            mOnSingleClickListener.onSingleClick();
+        }
 
 		return true;
 	}
@@ -292,5 +339,9 @@ public class RealViewSwitcher extends ViewGroup {
 	public void setOnScreenSwitchListener(OnScreenSwitchListener onScreenSwitchListener) {
 		mOnScreenSwitchListener = onScreenSwitchListener;
 	}
+
+    public void setOnOnSingleClickListener(OnSingleClickListener onSingleClickListener) {
+        mOnSingleClickListener = onSingleClickListener;
+    }
 
 }

@@ -60,8 +60,8 @@ public class CalendarView extends FrameLayout {
 	    items = new ArrayList<String>();
 	    adapter = new CalendarAdapter(getContext(), month);
 	    
-	    GridView gridview = (GridView) findViewById(R.id.gridview);
-	    gridview.setAdapter(adapter);
+	    CalendarGridView gridView = (CalendarGridView) findViewById(R.id.gridview);
+	    gridView.setAdapter(adapter);
 
 	    handler = new Handler();
 	    handler.post(calendarUpdater);
@@ -102,19 +102,25 @@ public class CalendarView extends FrameLayout {
 				
 			}
 		});
-	    
-/*		gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-		    public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 
-		    	TextView date = (TextView)v.findViewById(R.id.date);
-		        if(date instanceof TextView && !date.getText().equals("")) {
-		        	
-		        	String day = "Selected: " + date.getText().toString();
-                    Toast.makeText(getContext(), day, Toast.LENGTH_LONG).show();
-		        }
-		        
-		    }
-		});*/
+        gridView.setOnChildClickListener(new CalendarGridView.OnChildClickListener() {
+            @Override
+            public void onChildClick(View child) {
+
+                child.setBackgroundResource(R.drawable.item_background_focused);
+
+                TextView date = (TextView) child.findViewById(R.id.date);
+
+                if (date != null && !date.getText().equals("")) {
+                    String msg = "Selected: " + date.getText().toString();
+                    //Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+
+                    int day = Integer.parseInt(date.getText().toString());
+                    month.set(Calendar.DAY_OF_MONTH, day);
+                }
+            }
+        });
+	    
     }
 	
 	public void refreshCalendar()

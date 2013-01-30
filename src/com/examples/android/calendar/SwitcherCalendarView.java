@@ -18,10 +18,12 @@ package com.examples.android.calendar;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 
-public class SwitcherCalendarView extends FrameLayout {
+public class SwitcherCalendarView extends FrameLayout implements RealViewSwitcher.OnSingleClickListener {
 
     private RealViewSwitcher switcher;
 
@@ -51,8 +53,24 @@ public class SwitcherCalendarView extends FrameLayout {
 
         switcher.setCurrentScreen(1);
 
+        switcher.setOnOnSingleClickListener(this);
+
         addView(switcher);
 
     }
 
+    @Override
+    public void onSingleClick() {
+
+        Log.e("RVS", "!! onSingleClick");
+
+        int i = switcher.getCurrentScreen();
+
+        CalendarView selectedView = calendarViews[i];
+
+        String day = android.text.format.DateFormat.format("dd MMMM yyyy", selectedView.month).toString();
+
+        String msg = "Selected: " + day;
+        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+    }
 }
