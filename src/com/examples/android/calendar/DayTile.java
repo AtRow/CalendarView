@@ -8,6 +8,8 @@ import android.text.format.Time;
  */
 public class DayTile {
 
+    public DayInfo dayInfo;
+
     public boolean containsDay;
 
     public boolean isCurrentDay;

@@ -25,22 +25,22 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Random;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class CalendarView extends FrameLayout {
 
-    static final int FIRST_DAY_OF_WEEK = Time.SUNDAY;
-    //static final int FIRST_DAY_OF_WEEK = Time.MONDAY;
+    //static final int FIRST_DAY_OF_WEEK = Time.SUNDAY;
+    static final int FIRST_DAY_OF_WEEK = Time.MONDAY;
 
     public Time time;
 
     public Calendar month;
     public CalendarAdapter adapter;
     public Handler handler;
-    public ArrayList<String> items; // container to store some random calendar items
+    public Map<Integer, DayInfo> items; // container to store some random calendar items
 
     public CalendarView(Context context) {
         super(context);
@@ -69,7 +69,6 @@ public class CalendarView extends FrameLayout {
         //TODO
         month.set(2013, 0, 23);
 
-        items = new ArrayList<String>();
 	    adapter = new CalendarAdapter(getContext(), month, FIRST_DAY_OF_WEEK);
 	    
 	    CalendarGridView gridView = (CalendarGridView) findViewById(R.id.gridview);
@@ -150,16 +149,25 @@ public class CalendarView extends FrameLayout {
 
 		@Override
 		public void run() {
-			items.clear();
-			// format random values. You can implement a dedicated class to provide real values
+			items = new HashMap<Integer, DayInfo>();
+/*			// format random values. You can implement a dedicated class to provide real values
 			for(int i=0;i<31;i++) {
 				Random r = new Random();
 
 				if(r.nextInt(10)>6)
 				{
-					items.add(Integer.toString(i));
+					items.put(i, new DayInfo());
 				}
-			}
+			}*/
+
+            items.put(1, new DayInfo());
+            items.put(2, new DayInfo());
+            items.put(3, new DayInfo());
+            items.put(6, new DayInfo());
+            items.put(15, new DayInfo());
+            items.put(30, new DayInfo());
+            items.put(31, new DayInfo());
+            items.put(29, new DayInfo());
 
 			adapter.setItems(items);
 			adapter.notifyDataSetChanged();

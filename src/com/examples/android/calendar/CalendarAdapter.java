@@ -22,10 +22,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Map;
 
 public class CalendarAdapter extends BaseAdapter {
 
@@ -35,9 +36,9 @@ public class CalendarAdapter extends BaseAdapter {
 	
 	private Context context;
 
-    private ArrayList<String> items;
-
     private DayTile[] dayTiles;
+
+    private int offset;
 
 
     public CalendarAdapter(Context context, Calendar monthCalendar, int firstDayOfWeek) {
@@ -51,22 +52,24 @@ public class CalendarAdapter extends BaseAdapter {
         currentDate.monthDay = monthCalendar.get(Calendar.DAY_OF_MONTH);
         currentDate.normalize(false);
 
-        this.items = new ArrayList<String>();
         refreshDays();
     }
     
-    public void setItems(ArrayList<String> items) {
-    	for(int i = 0;i != items.size();i++){
-    		if(items.get(i).length()==1) {
-    		items.set(i, "0" + items.get(i));
-    		}
+    public void setItems(Map<Integer, DayInfo> items) {
+
+    	for(int i = 0; i < dayTiles.length; i++){
+            if (items.containsKey(i+1)) {
+                DayInfo info = items.get(i+1);
+                dayTiles[i].dayInfo = info;
+            } else {
+                dayTiles[i].dayInfo = null;
+            }
     	}
-    	this.items = items;
     }
 
     @Override
     public int getCount() {
-        return dayTiles.length;
+        return offset + dayTiles.length;
     }
 
     @Override
@@ -83,8 +86,6 @@ public class CalendarAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        DayTile tile = dayTiles[position];
-
         View v = convertView;
     	TextView dayView;
         if (convertView == null) {  // if it's not recycled, initialize some attributes
@@ -92,49 +93,41 @@ public class CalendarAdapter extends BaseAdapter {
             v = vi.inflate(R.layout.calendar_item, null);
         	
         }
-        dayView = (TextView)v.findViewById(R.id.date);
+
+        if (position >= offset) {
+            DayTile tile = dayTiles[position - offset];
+
+            dayView = (TextView)v.findViewById(R.id.date);
+            dayView.setText(Integer.toString(tile.getMonthDay()));
         
-        if(tile.containsDay) {
-            // mark current day as focused
             if(tile.isCurrentDay) {
                 v.setBackgroundResource(R.drawable.item_background_focused);
             }
             else {
                 v.setBackgroundResource(R.drawable.list_item_background);
             }
+
+            // show icon if date is not empty and it exists in the items array
+            ImageView iw = (ImageView)v.findViewById(R.id.date_icon);
+
+            if(tile.dayInfo != null) {
+                iw.setVisibility(View.VISIBLE);
+            } else {
+                iw.setVisibility(View.INVISIBLE);
+            }
+
+            // don't forget to show reused view
+            v.setVisibility(View.VISIBLE);
+
         } else {
             // disable empty days from the beginning
             v.setVisibility(View.INVISIBLE);
         }
 
-        dayView.setText(Integer.toString(tile.getMonthDay()));
-/*
-        // create date string for comparison
-        String date = days[position];
-    	
-        if(date.length()==1) {
-    		date = "0"+date;
-    	}
-    	String monthStr = ""+(month.get(Calendar.MONTH)+1);
-    	if(monthStr.length()==1) {
-    		monthStr = "0"+monthStr;
-    	}
-       
-        // show icon if date is not empty and it exists in the items array
-        ImageView iw = (ImageView)v.findViewById(R.id.date_icon);
-        if(date.length()>0 && items!=null && items.contains(date)) {        	
-        	iw.setVisibility(View.VISIBLE);
-        }
-        else {
-        	iw.setVisibility(View.INVISIBLE);
-        }
-        */
         return v;
     }
     
     public void refreshDays() {
-    	// clear items
-    	items.clear();
 
         Time counter = new Time(currentDate);
 
@@ -144,18 +137,11 @@ public class CalendarAdapter extends BaseAdapter {
         int weekDayOn1st = counter.weekDay;
         int daysInMonth = counter.getActualMaximum(Time.MONTH_DAY);
 
-        int emptyTilesCount = weekDayOn1st - firstDayOfWeek;
-        int fullLength = emptyTilesCount + daysInMonth;
+        offset = weekDayOn1st - firstDayOfWeek;
 
-        dayTiles = new DayTile[emptyTilesCount + daysInMonth];
+        dayTiles = new DayTile[daysInMonth];
 
-        // At first, fill with empty
-        for (int i = 0; i < emptyTilesCount; i++) {
-            dayTiles[i] = new DayTile();
-        }
-
-        // Rest with values
-        for (int i = emptyTilesCount; i < fullLength; i++) {
+        for (int i = 0; i < daysInMonth; i++) {
             dayTiles[i] = new DayTile(counter);
 
             if (currentDate.monthDay == counter.monthDay) {
