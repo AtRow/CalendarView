@@ -28,7 +28,7 @@ import java.util.Calendar;
 import java.util.Random;
 
 
-public class CalendarView extends LinearLayout {
+public class CalendarView extends FrameLayout {
 
     public Calendar month;
     public CalendarAdapter adapter;

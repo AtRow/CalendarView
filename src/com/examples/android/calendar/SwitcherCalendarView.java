@@ -18,12 +18,10 @@ package com.examples.android.calendar;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 
 
-public class SwitcherCalendarView extends LinearLayout {
+public class SwitcherCalendarView extends FrameLayout {
 
     private RealViewSwitcher switcher;
 
@@ -42,7 +40,7 @@ public class SwitcherCalendarView extends LinearLayout {
     private void init() {
 
         switcher = new RealViewSwitcher(getContext());
-        switcher.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
+        switcher.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 
         calendarViews = new CalendarView[3];
 
@@ -50,6 +48,8 @@ public class SwitcherCalendarView extends LinearLayout {
             calendarViews[i] = new CalendarView(getContext());
             switcher.addView(calendarViews[i]);
         }
+
+        switcher.setCurrentScreen(1);
 
         addView(switcher);
 
