@@ -76,6 +76,9 @@ public class CalendarView extends FrameLayout {
         month.second = 0;
         month.monthDay = 1;
 
+        String day = month.format("%Y %m");
+        Log.w("SCV", "Updated calendar to: " + day);
+
         update();
     }
 
@@ -86,8 +89,8 @@ public class CalendarView extends FrameLayout {
             setMonth(time);
         }
 
-        String day = this.month.format("%Y %m");
-        Log.w("SCV", "Updated calendar to: " + day);
+        String day = selected.format("%Y %m %d");
+        Log.w("SCV", "Set selected day to: " + day);
 
         update();
     }
@@ -166,7 +169,7 @@ public class CalendarView extends FrameLayout {
         if (month != null) {
             month.month += offset;
             month.normalize(false);
-            setDate(month);
+            setMonth(month);
         }
     }
 

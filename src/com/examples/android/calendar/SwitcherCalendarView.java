@@ -36,8 +36,6 @@ public class SwitcherCalendarView extends FrameLayout {
 
     private HorizontalPager pager;
 
-    private CalendarView[] calendarViews;
-
     private FrameLayout leftScreen;
     private FrameLayout centerScreen;
     private FrameLayout rightScreen;
@@ -74,22 +72,10 @@ public class SwitcherCalendarView extends FrameLayout {
         currCalendar = new CalendarView(getContext());
         nextCalendar = new CalendarView(getContext());
 
-        calendarViews = new CalendarView[] {prevCalendar, currCalendar, nextCalendar};
-
         Time time = new Time();
         time.setToNow();
-        time.monthDay = 1;
-        time.hour = 0;
-        time.minute = 0;
-        time.second = 0;
-        time.month--;
 
-        for (int i = 0; i < 3; i++) {
-            time.normalize(false);
-            calendarViews[i].setMonth(time);
-            time.month++;
-        }
-
+        setTime(time);
 
         leftScreen.addView(prevCalendar);
         centerScreen.addView(currCalendar);
@@ -137,13 +123,15 @@ public class SwitcherCalendarView extends FrameLayout {
         date.second = 0;
         date.month--;
 
-        calendarViews = new CalendarView[] {prevCalendar, currCalendar, nextCalendar};
+        CalendarView[] calendarViews = new CalendarView[] {prevCalendar, currCalendar, nextCalendar};
 
         for (int i = 0; i < 3; i++) {
-            time.normalize(false);
+            date.normalize(false);
             calendarViews[i].setMonth(date);
-            time.month++;
+            date.month++;
         }
+
+        currCalendar.setDate(time);
     }
 
     private final HorizontalPager.OnScreenSwitchListener onScreenSwitchListener = new HorizontalPager.OnScreenSwitchListener() {
