@@ -18,22 +18,30 @@ package com.examples.android.calendar;
 
 import android.content.Context;
 import android.os.Handler;
+import android.text.format.Time;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.*;
+import android.widget.FrameLayout;
+import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Random;
+import java.util.Map;
 
 
-public class CalendarView extends LinearLayout {
+public class CalendarView extends FrameLayout {
 
-    public Calendar month;
-    public CalendarAdapter adapter;
-    public Handler handler;
-    public ArrayList<String> items; // container to store some random calendar items
+    //static final int FIRST_DAY_OF_WEEK = Time.SUNDAY;
+    static final int FIRST_DAY_OF_WEEK = Time.MONDAY;
+
+    private Time month;
+    private Time selected;
+
+    private CalendarGridView gridView;
+
+    private CalendarAdapter adapter;
+    private Handler handler;
+    private Map<Integer, DayInfo> items; // container to store some random calendar items
 
     public CalendarView(Context context) {
         super(context);
@@ -48,104 +56,85 @@ public class CalendarView extends LinearLayout {
     private void init() {
         LayoutInflater li = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         li.inflate(R.layout.calendar, this, true);
+
+        gridView = (CalendarGridView) findViewById(R.id.gridview);
+    }
+
+
+    public Time getMonth() {
+        return month;
+    }
+
+    public Time getDate() {
+        return selected;
+    }
+
+    public void setMonth(Time time) {
+        month = new Time(time);
+        month.hour = 0;
+        month.minute = 0;
+        month.second = 0;
+        month.monthDay = 1;
+
+        String day = month.format("%Y %m");
+        Log.d("SCV", "Updated calendar to: " + day);
+
+        update();
+    }
+
+    public void setDate(Time time) {
+        selected = new Time(time);
+
+        if (month == null) {
+            setMonth(time);
+        }
+
+        String day = selected.format("%Y %m %d");
+        Log.d("SCV", "Set selected day to: " + day);
+
+        update();
+    }
+
+    private void update() {
+        if (month != null) {
+            adapter = new CalendarAdapter(getContext(), month, selected, FIRST_DAY_OF_WEEK);
+            gridView.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
+        }
     }
 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
 
-        month = Calendar.getInstance();
+        gridView.setOnChildClickListener(new CalendarGridView.OnChildClickListener() {
+            @Override
+            public void onChildClick(View child) {
 
+                child.setBackgroundResource(R.drawable.item_background_focused);
 
-	    items = new ArrayList<String>();
-	    adapter = new CalendarAdapter(getContext(), month);
+                TextView date = (TextView) child.findViewById(R.id.date);
+
+                if (date != null && !date.getText().equals("")) {
+                    String msg = "Selected: " + date.getText().toString();
+                    //Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+
+                    int day = Integer.parseInt(date.getText().toString());
+
+                    selected = new Time(month);
+                    selected.monthDay = day;
+                }
+            }
+        });
 	    
-	    GridView gridview = (GridView) findViewById(R.id.gridview);
-	    gridview.setAdapter(adapter);
-
-	    handler = new Handler();
-	    handler.post(calendarUpdater);
-
-        //TODO
-        month.set(2012, 06, 23);
-
-
-
-	    TextView title  = (TextView) findViewById(R.id.title);
-	    title.setText(android.text.format.DateFormat.format("MMMM yyyy", month));
-
-	    TextView previous  = (TextView) findViewById(R.id.previous);
-	    previous.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				if(month.get(Calendar.MONTH)== month.getActualMinimum(Calendar.MONTH)) {				
-					month.set((month.get(Calendar.YEAR)-1),month.getActualMaximum(Calendar.MONTH),1);
-				} else {
-					month.set(Calendar.MONTH,month.get(Calendar.MONTH)-1);
-				}
-				refreshCalendar();
-			}
-		});
-	    
-	    TextView next  = (TextView) findViewById(R.id.next);
-	    next.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				if(month.get(Calendar.MONTH)== month.getActualMaximum(Calendar.MONTH)) {				
-					month.set((month.get(Calendar.YEAR)+1),month.getActualMinimum(Calendar.MONTH),1);
-				} else {
-					month.set(Calendar.MONTH,month.get(Calendar.MONTH)+1);
-				}
-				refreshCalendar();
-				
-			}
-		});
-	    
-		gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-		    public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-
-		    	TextView date = (TextView)v.findViewById(R.id.date);
-		        if(date instanceof TextView && !date.getText().equals("")) {
-		        	
-		        	String day = "Selected: " + date.getText().toString();
-                    Toast.makeText(getContext(), day, Toast.LENGTH_LONG).show();
-		        }
-		        
-		    }
-		});
     }
-	
-	public void refreshCalendar()
-	{
-		TextView title  = (TextView) findViewById(R.id.title);
-		
-		adapter.refreshDays();
-		adapter.notifyDataSetChanged();				
-		handler.post(calendarUpdater); // generate some random calendar items				
-		
-		title.setText(android.text.format.DateFormat.format("MMMM yyyy", month));
-	}
-	
 
-	public Runnable calendarUpdater = new Runnable() {
+    public void offsetMonth(int offset) {
 
-		@Override
-		public void run() {
-			items.clear();
-			// format random values. You can implement a dedicated class to provide real values
-			for(int i=0;i<31;i++) {
-				Random r = new Random();
-
-				if(r.nextInt(10)>6)
-				{
-					items.add(Integer.toString(i));
-				}
-			}
-
-			adapter.setItems(items);
-			adapter.notifyDataSetChanged();
-		}
-	};
+        if (month != null) {
+            month.month += offset;
+            month.normalize(true);
+            setMonth(month);
+        }
+    }
 }
