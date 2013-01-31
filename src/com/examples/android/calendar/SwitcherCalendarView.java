@@ -21,6 +21,7 @@ import android.text.format.Time;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -45,6 +46,8 @@ public class SwitcherCalendarView extends FrameLayout {
     private CalendarView currCalendar;
     private CalendarView nextCalendar;
 
+    private FrameLayout container;
+
 
     public SwitcherCalendarView(Context context) {
         super(context);
@@ -57,6 +60,8 @@ public class SwitcherCalendarView extends FrameLayout {
     }
 
     private void init() {
+
+        inflate();
 
         pager = new HorizontalPager(getContext());
         pager.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
@@ -81,7 +86,7 @@ public class SwitcherCalendarView extends FrameLayout {
 
         for (int i = 0; i < 3; i++) {
             time.normalize(false);
-            calendarViews[i].setDate(time);
+            calendarViews[i].setMonth(time);
             time.month++;
         }
 
@@ -114,7 +119,31 @@ public class SwitcherCalendarView extends FrameLayout {
             }
         });
 
-        addView(pager);
+        container.addView(pager);
+    }
+
+    private void inflate() {
+        LayoutInflater li = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        li.inflate(R.layout.switcher, this, true);
+
+        container = (FrameLayout) findViewById(R.id.switcherContainer);
+    }
+
+    public void setTime(Time time) {
+        Time date = new Time(time);
+        date.monthDay = 1;
+        date.hour = 0;
+        date.minute = 0;
+        date.second = 0;
+        date.month--;
+
+        calendarViews = new CalendarView[] {prevCalendar, currCalendar, nextCalendar};
+
+        for (int i = 0; i < 3; i++) {
+            time.normalize(false);
+            calendarViews[i].setMonth(date);
+            time.month++;
+        }
     }
 
     private final HorizontalPager.OnScreenSwitchListener onScreenSwitchListener = new HorizontalPager.OnScreenSwitchListener() {

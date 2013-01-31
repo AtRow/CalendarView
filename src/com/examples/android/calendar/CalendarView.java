@@ -34,7 +34,8 @@ public class CalendarView extends FrameLayout {
     //static final int FIRST_DAY_OF_WEEK = Time.SUNDAY;
     static final int FIRST_DAY_OF_WEEK = Time.MONDAY;
 
-    private Time time;
+    private Time month;
+    private Time selected;
 
     private CalendarGridView gridView;
 
@@ -60,24 +61,43 @@ public class CalendarView extends FrameLayout {
     }
 
 
+    public Time getMonth() {
+        return month;
+    }
+
     public Time getDate() {
-        return time;
+        return selected;
+    }
+
+    public void setMonth(Time time) {
+        month = new Time(time);
+        month.hour = 0;
+        month.minute = 0;
+        month.second = 0;
+        month.monthDay = 1;
+
+        update();
     }
 
     public void setDate(Time time) {
-        this.time = new Time(time);
+        selected = new Time(time);
 
-        String day = this.time.format("%Y %m");
-        Log.w("SCV", "Updated calendar to: " + day);
-
-        if (time != null) {
-            adapter = new CalendarAdapter(getContext(), time, FIRST_DAY_OF_WEEK);
-            gridView.setAdapter(adapter);
-            adapter.notifyDataSetChanged();
-            gridView.invalidate();
-
+        if (month == null) {
+            setMonth(time);
         }
 
+        String day = this.month.format("%Y %m");
+        Log.w("SCV", "Updated calendar to: " + day);
+
+        update();
+    }
+
+    private void update() {
+        if (month != null) {
+            adapter = new CalendarAdapter(getContext(), month, selected, FIRST_DAY_OF_WEEK);
+            gridView.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
+        }
     }
 
     @Override
@@ -132,7 +152,9 @@ public class CalendarView extends FrameLayout {
                     //Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
 
                     int day = Integer.parseInt(date.getText().toString());
-                    time.monthDay = day;
+
+                    selected = new Time(month);
+                    selected.monthDay = day;
                 }
             }
         });
@@ -141,12 +163,13 @@ public class CalendarView extends FrameLayout {
 
     public void offsetMonth(int offset) {
 
-        if (time != null) {
-            time.month += offset;
-            time.normalize(false);
-            setDate(time);
+        if (month != null) {
+            month.month += offset;
+            month.normalize(false);
+            setDate(month);
         }
     }
+
 
 	
 /*	public void refreshCalendar()

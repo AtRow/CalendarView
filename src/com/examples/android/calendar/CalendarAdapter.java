@@ -29,7 +29,9 @@ import java.util.Map;
 
 public class CalendarAdapter extends BaseAdapter {
 
-    private Time currentDate;
+    private Time currentMonth;
+
+    private Time selected;
 
     private int firstDayOfWeek;
 	
@@ -40,12 +42,16 @@ public class CalendarAdapter extends BaseAdapter {
     private int offset;
 
 
-    public CalendarAdapter(Context context, Time time, int firstDayOfWeek) {
+    public CalendarAdapter(Context context, Time month, Time selected, int firstDayOfWeek) {
 
         this.context = context;
         this.firstDayOfWeek = firstDayOfWeek;
 
-        currentDate = new Time(time);
+        currentMonth = new Time(month);
+
+        if (selected != null) {
+            this.selected = new Time(selected);
+        }
 
         refreshDays();
     }
@@ -124,7 +130,7 @@ public class CalendarAdapter extends BaseAdapter {
     
     public void refreshDays() {
 
-        Time counter = new Time(currentDate);
+        Time counter = new Time(currentMonth);
 
         counter.monthDay = 1;
         counter.normalize(false);
@@ -142,8 +148,13 @@ public class CalendarAdapter extends BaseAdapter {
         for (int i = 0; i < daysInMonth; i++) {
             dayTiles[i] = new DayTile(counter);
 
-            if (currentDate.monthDay == counter.monthDay) {
+            if ((selected != null) &&
+                (counter.year == selected.year) &&
+                (counter.month == selected.month) &&
+                (counter.monthDay == selected.monthDay)) {
                 dayTiles[i].isCurrentDay = true;
+            } else {
+                dayTiles[i].isCurrentDay = false;
             }
             counter.monthDay++;
         }

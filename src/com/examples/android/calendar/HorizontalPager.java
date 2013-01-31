@@ -34,7 +34,7 @@ public final class HorizontalPager extends ViewGroup
 	    private static final int TOUCH_STATE_HORIZONTAL_SCROLLING = 1;
 	    private static final int TOUCH_STATE_VERTICAL_SCROLLING = -1;
 	    private int mCurrentScreen;
-	    private int mDensityAdjustedSnapVelocity;
+	    private int mDensityAdjustedSnapVelocity = SNAP_VELOCITY_DIP_PER_SECOND;
 	    private boolean mFirstLayout = true;
 	    private float mLastMotionX;
 	    private float mLastMotionY;
@@ -86,10 +86,14 @@ public final class HorizontalPager extends ViewGroup
 
 	        // Calculate the density-dependent snap velocity in pixels
 	        DisplayMetrics displayMetrics = new DisplayMetrics();
-	        ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay()
-	                .getMetrics(displayMetrics);
-	        mDensityAdjustedSnapVelocity =
-	                (int) (displayMetrics.density * SNAP_VELOCITY_DIP_PER_SECOND);
+
+            WindowManager windowManager = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
+            if (windowManager != null) {
+                    windowManager.getDefaultDisplay().getMetrics(displayMetrics);
+                    mDensityAdjustedSnapVelocity = (int) (displayMetrics.density * SNAP_VELOCITY_DIP_PER_SECOND);
+            }
+//	        ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay()
+//	                .getMetrics(displayMetrics);
 
 	        final ViewConfiguration configuration = ViewConfiguration.get(getContext());
 	        mTouchSlop = configuration.getScaledTouchSlop();
@@ -103,12 +107,12 @@ public final class HorizontalPager extends ViewGroup
 	        final int width = MeasureSpec.getSize(widthMeasureSpec);
 	        final int widthMode = MeasureSpec.getMode(widthMeasureSpec);
 	        if (widthMode != MeasureSpec.EXACTLY) {
-	            throw new IllegalStateException("ViewSwitcher can only be used in EXACTLY mode.");
+	            throw new IllegalStateException("HorizontalPager can only be used in EXACTLY mode.");
 	        }
 
 	        final int heightMode = MeasureSpec.getMode(heightMeasureSpec);
 	        if (heightMode != MeasureSpec.EXACTLY) {
-	            throw new IllegalStateException("ViewSwitcher can only be used in EXACTLY mode.");
+	            throw new IllegalStateException("HorizontalPager can only be used in EXACTLY mode.");
 	        }
 
 	        // The children are given the same width and height as the workspace
