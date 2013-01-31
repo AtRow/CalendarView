@@ -20,15 +20,27 @@ import android.content.Context;
 import android.text.format.Time;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
 
-public class SwitcherCalendarView extends FrameLayout implements RealViewSwitcher.OnSingleClickListener {
+public class SwitcherCalendarView extends FrameLayout {
 
-    private RealViewSwitcher switcher;
+    private static final int LEFT = 0;
+    private static final int CENTER = 1;
+    private static final int RIGHT = 2;
+
+    private HorizontalPager pager;
 
     private CalendarView[] calendarViews;
+
+    private CalendarView prevCalendar;
+    private CalendarView currCalendar;
+    private CalendarView nextCalendar;
+
 
     public SwitcherCalendarView(Context context) {
         super(context);
@@ -42,39 +54,107 @@ public class SwitcherCalendarView extends FrameLayout implements RealViewSwitche
 
     private void init() {
 
-        switcher = new RealViewSwitcher(getContext());
-        switcher.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+        pager = new HorizontalPager(getContext());
+        pager.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+
+        prevCalendar = new CalendarView(getContext());
+        currCalendar = new CalendarView(getContext());
+        nextCalendar = new CalendarView(getContext());
+
+        calendarViews = new CalendarView[] {prevCalendar, currCalendar, nextCalendar};
 
         Time time = new Time();
         time.setToNow();
+        time.monthDay = 1;
+        time.hour = 0;
+        time.minute = 0;
+        time.second = 0;
         time.month--;
 
-        calendarViews = new CalendarView[3];
-
         for (int i = 0; i < 3; i++) {
-            calendarViews[i] = new CalendarView(getContext());
-
             time.normalize(false);
             calendarViews[i].setDate(time);
             time.month++;
 
-            switcher.addView(calendarViews[i]);
+            pager.addView(calendarViews[i]);
         }
 
-        switcher.setCurrentScreen(1);
+        pager.setCurrentScreen(CENTER, false);
 
-        switcher.setOnOnSingleClickListener(this);
+        pager.setOnScreenSwitchListener(onScreenSwitchListener);
 
-        addView(switcher);
+        //pager.setOnOnSingleClickListener(this);
+
+
+        final GestureDetector tapGestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onSingleTapConfirmed(MotionEvent e) {
+                onSingleClick();
+                return true;
+            }
+        });
+
+        pager.setOnTouchListener(new OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+                tapGestureDetector.onTouchEvent(event);
+                return false;
+            }
+        });
+
+        addView(pager);
+    }
+
+    public void loadNewContent(int screen, int offset) {
+
+        Time time = new Time( calendarViews[screen].getDate() );
+        time.month += offset;
+        time.normalize(false);
+        calendarViews[screen].setDate(time);
+        // TODO: prevCalendar.alterMonth(newCurrPage-1);
+
+
+        String day = calendarViews[screen].getDate().format("%Y %m");
+
+        Log.w("SCV", "Updated [" + screen + "] to: " + day);
 
     }
 
-    @Override
-    public void onSingleClick() {
+    private final HorizontalPager.OnScreenSwitchListener onScreenSwitchListener = new HorizontalPager.OnScreenSwitchListener() {
+        public void onScreenSwitched(final int screen) {
+            /*
+            * this method is executed if a screen has been activated, i.e. the screen is
+			* completely visible and the animation has stopped (might be useful for
+			* removing / adding new views)
+			*/
+
+            //
+            switch (screen) {
+
+                case LEFT:
+                    loadNewContent(CENTER, -1);
+                    loadNewContent(RIGHT, -1);
+                    pager.setCurrentScreen(CENTER, false);
+                    loadNewContent(LEFT, -1);
+
+                    break;
+
+                case RIGHT:
+                    loadNewContent(CENTER, 1);
+                    loadNewContent(LEFT, 1);
+                    pager.setCurrentScreen(CENTER, false);
+                    loadNewContent(RIGHT, 1);
+
+                    break;
+
+            }
+        }
+    };
+
+    private void onSingleClick() {
 
         Log.e("RVS", "!! onSingleClick");
 
-        int i = switcher.getCurrentScreen();
+        int i = pager.getCurrentScreen();
 
         CalendarView selectedView = calendarViews[i];
 

@@ -27,7 +27,7 @@ public class CalendarGridView extends GridView {
         super(context, attrs, defStyle);
     }
 
-    public static interface OnChildClickListener {
+    public interface OnChildClickListener {
         void onChildClick(View child);
     }
 

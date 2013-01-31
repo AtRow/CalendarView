@@ -20,6 +20,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.text.format.Time;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -65,6 +66,9 @@ public class CalendarView extends FrameLayout {
 
     public void setDate(Time time) {
         this.time = new Time(time);
+
+        String day = this.time.format("%Y %m");
+        Log.w("SCV", "Updated calendar to: " + day);
 
         if (time != null) {
             adapter = new CalendarAdapter(getContext(), time, FIRST_DAY_OF_WEEK);
