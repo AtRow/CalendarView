@@ -37,6 +37,10 @@ public class SwitcherCalendarView extends FrameLayout {
 
     private CalendarView[] calendarViews;
 
+    private FrameLayout leftScreen;
+    private FrameLayout centerScreen;
+    private FrameLayout rightScreen;
+
     private CalendarView prevCalendar;
     private CalendarView currCalendar;
     private CalendarView nextCalendar;
@@ -57,6 +61,10 @@ public class SwitcherCalendarView extends FrameLayout {
         pager = new HorizontalPager(getContext());
         pager.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 
+        leftScreen = new FrameLayout(getContext());
+        centerScreen = new FrameLayout(getContext());
+        rightScreen = new FrameLayout(getContext());
+
         prevCalendar = new CalendarView(getContext());
         currCalendar = new CalendarView(getContext());
         nextCalendar = new CalendarView(getContext());
@@ -75,15 +83,20 @@ public class SwitcherCalendarView extends FrameLayout {
             time.normalize(false);
             calendarViews[i].setDate(time);
             time.month++;
-
-            pager.addView(calendarViews[i]);
         }
+
+
+        leftScreen.addView(prevCalendar);
+        centerScreen.addView(currCalendar);
+        rightScreen.addView(nextCalendar);
+
+        pager.addView(leftScreen);
+        pager.addView(centerScreen);
+        pager.addView(rightScreen);
 
         pager.setCurrentScreen(CENTER, false);
 
         pager.setOnScreenSwitchListener(onScreenSwitchListener);
-
-        //pager.setOnOnSingleClickListener(this);
 
 
         final GestureDetector tapGestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
@@ -104,21 +117,6 @@ public class SwitcherCalendarView extends FrameLayout {
         addView(pager);
     }
 
-    public void loadNewContent(int screen, int offset) {
-
-        Time time = new Time( calendarViews[screen].getDate() );
-        time.month += offset;
-        time.normalize(false);
-        calendarViews[screen].setDate(time);
-        // TODO: prevCalendar.alterMonth(newCurrPage-1);
-
-
-        String day = calendarViews[screen].getDate().format("%Y %m");
-
-        Log.w("SCV", "Updated [" + screen + "] to: " + day);
-
-    }
-
     private final HorizontalPager.OnScreenSwitchListener onScreenSwitchListener = new HorizontalPager.OnScreenSwitchListener() {
         public void onScreenSwitched(final int screen) {
             /*
@@ -131,18 +129,48 @@ public class SwitcherCalendarView extends FrameLayout {
             switch (screen) {
 
                 case LEFT:
-                    loadNewContent(CENTER, -1);
-                    loadNewContent(RIGHT, -1);
+
+                    // release currCalendar
+                    centerScreen.removeAllViews();
+                    // release prevCalendar
+                    leftScreen.removeAllViews();
+                    centerScreen.addView(prevCalendar);
                     pager.setCurrentScreen(CENTER, false);
-                    loadNewContent(LEFT, -1);
+
+                    // release nextCalendar
+                    rightScreen.removeAllViews();
+
+                    rightScreen.addView(currCalendar);
+                    leftScreen.addView(nextCalendar);
+
+                    nextCalendar.offsetMonth(-3);
+
+                    prevCalendar = (CalendarView) leftScreen.getChildAt(0);
+                    currCalendar = (CalendarView) centerScreen.getChildAt(0);
+                    nextCalendar = (CalendarView) rightScreen.getChildAt(0);
 
                     break;
 
                 case RIGHT:
-                    loadNewContent(CENTER, 1);
-                    loadNewContent(LEFT, 1);
+
+                    // release currCalendar
+                    centerScreen.removeAllViews();
+                    // release nextCalendar
+                    rightScreen.removeAllViews();
+                    centerScreen.addView(nextCalendar);
                     pager.setCurrentScreen(CENTER, false);
-                    loadNewContent(RIGHT, 1);
+
+                    // release prevCalendar
+                    leftScreen.removeAllViews();
+
+                    rightScreen.addView(prevCalendar);
+                    leftScreen.addView(currCalendar);
+
+                    prevCalendar.offsetMonth(+3);
+
+                    prevCalendar = (CalendarView) leftScreen.getChildAt(0);
+                    currCalendar = (CalendarView) centerScreen.getChildAt(0);
+                    nextCalendar = (CalendarView) rightScreen.getChildAt(0);
 
                     break;
 
@@ -156,7 +184,10 @@ public class SwitcherCalendarView extends FrameLayout {
 
         int i = pager.getCurrentScreen();
 
-        CalendarView selectedView = calendarViews[i];
+        FrameLayout fl = (FrameLayout) pager.getChildAt(i);
+        CalendarView selectedView = (CalendarView) fl.getChildAt(0);
+
+        //CalendarView selectedView = calendarViews[i];
 
         String day = selectedView.getDate().format("%Y.%m.%d %H:%M:%S");
 

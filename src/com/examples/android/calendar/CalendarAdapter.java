@@ -133,6 +133,9 @@ public class CalendarAdapter extends BaseAdapter {
         int daysInMonth = counter.getActualMaximum(Time.MONTH_DAY);
 
         offset = weekDayOn1st - firstDayOfWeek;
+        if (offset < 0) {
+            offset += 7;
+        }
 
         dayTiles = new DayTile[daysInMonth];
 

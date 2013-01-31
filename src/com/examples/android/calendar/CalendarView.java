@@ -74,6 +74,8 @@ public class CalendarView extends FrameLayout {
             adapter = new CalendarAdapter(getContext(), time, FIRST_DAY_OF_WEEK);
             gridView.setAdapter(adapter);
             adapter.notifyDataSetChanged();
+            gridView.invalidate();
+
         }
 
     }
@@ -135,6 +137,15 @@ public class CalendarView extends FrameLayout {
             }
         });
 	    
+    }
+
+    public void offsetMonth(int offset) {
+
+        if (time != null) {
+            time.month += offset;
+            time.normalize(false);
+            setDate(time);
+        }
     }
 
 	
