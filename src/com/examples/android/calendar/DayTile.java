@@ -25,7 +25,7 @@ public class DayTile {
 
     public DayTile(Time time) {
         this.time = new Time(time);
-        this.time.normalize(false);
+        this.time.normalize(true);
         containsDay = true;
     }
 

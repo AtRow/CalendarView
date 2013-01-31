@@ -77,7 +77,7 @@ public class CalendarView extends FrameLayout {
         month.monthDay = 1;
 
         String day = month.format("%Y %m");
-        Log.w("SCV", "Updated calendar to: " + day);
+        Log.d("SCV", "Updated calendar to: " + day);
 
         update();
     }
@@ -90,7 +90,7 @@ public class CalendarView extends FrameLayout {
         }
 
         String day = selected.format("%Y %m %d");
-        Log.w("SCV", "Set selected day to: " + day);
+        Log.d("SCV", "Set selected day to: " + day);
 
         update();
     }
@@ -107,41 +107,6 @@ public class CalendarView extends FrameLayout {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
 
-/*
-
-	    TextView title  = (TextView) findViewById(R.id.title);
-	    title.setText(android.text.format.DateFormat.format("MMMM yyyy", month));
-
-	    TextView previous  = (TextView) findViewById(R.id.previous);
-	    previous.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				if(month.get(Calendar.MONTH)== month.getActualMinimum(Calendar.MONTH)) {				
-					month.set((month.get(Calendar.YEAR)-1),month.getActualMaximum(Calendar.MONTH),1);
-				} else {
-					month.set(Calendar.MONTH,month.get(Calendar.MONTH)-1);
-				}
-				refreshCalendar();
-			}
-		});
-	    
-	    TextView next  = (TextView) findViewById(R.id.next);
-	    next.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				if(month.get(Calendar.MONTH)== month.getActualMaximum(Calendar.MONTH)) {				
-					month.set((month.get(Calendar.YEAR)+1),month.getActualMinimum(Calendar.MONTH),1);
-				} else {
-					month.set(Calendar.MONTH,month.get(Calendar.MONTH)+1);
-				}
-				refreshCalendar();
-				
-			}
-		});
-
-*/
         gridView.setOnChildClickListener(new CalendarGridView.OnChildClickListener() {
             @Override
             public void onChildClick(View child) {
@@ -168,7 +133,7 @@ public class CalendarView extends FrameLayout {
 
         if (month != null) {
             month.month += offset;
-            month.normalize(false);
+            month.normalize(true);
             setMonth(month);
         }
     }

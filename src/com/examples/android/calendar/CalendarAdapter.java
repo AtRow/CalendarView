@@ -133,7 +133,7 @@ public class CalendarAdapter extends BaseAdapter {
         Time counter = new Time(currentMonth);
 
         counter.monthDay = 1;
-        counter.normalize(false);
+        counter.normalize(true);
 
         int weekDayOn1st = counter.weekDay;
         int daysInMonth = counter.getActualMaximum(Time.MONTH_DAY);
