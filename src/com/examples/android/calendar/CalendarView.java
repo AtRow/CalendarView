@@ -137,47 +137,4 @@ public class CalendarView extends FrameLayout {
             setMonth(month);
         }
     }
-
-
-	
-/*	public void refreshCalendar()
-	{
-		TextView title  = (TextView) findViewById(R.id.title);
-		
-		adapter.refreshDays();
-		adapter.notifyDataSetChanged();				
-		handler.post(calendarUpdater); // generate some random calendar items				
-		
-		title.setText(android.text.format.DateFormat.format("MMMM yyyy", month));
-	}
-	
-
-	public Runnable calendarUpdater = new Runnable() {
-
-		@Override
-		public void run() {
-			items = new HashMap<Integer, DayInfo>();
-*//*			// format random values. You can implement a dedicated class to provide real values
-			for(int i=0;i<31;i++) {
-				Random r = new Random();
-
-				if(r.nextInt(10)>6)
-				{
-					items.put(i, new DayInfo());
-				}
-			}*//*
-
-            items.put(1, new DayInfo());
-            items.put(2, new DayInfo());
-            items.put(3, new DayInfo());
-            items.put(6, new DayInfo());
-            items.put(15, new DayInfo());
-            items.put(30, new DayInfo());
-            items.put(31, new DayInfo());
-            items.put(29, new DayInfo());
-
-			adapter.setItems(items);
-			adapter.notifyDataSetChanged();
-		}
-	};*/
 }

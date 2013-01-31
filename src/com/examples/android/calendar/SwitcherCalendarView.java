@@ -173,7 +173,6 @@ public class SwitcherCalendarView extends FrameLayout {
 			* removing / adding new views)
 			*/
 
-            //
             switch (screen) {
 
                 case LEFT:
@@ -197,9 +196,9 @@ public class SwitcherCalendarView extends FrameLayout {
                     currCalendar = (CalendarView) centerScreen.getChildAt(0);
                     nextCalendar = (CalendarView) rightScreen.getChildAt(0);
 
-                    Log.w("SCV", "LEFT   [" + prevCalendar.getMonth().format("%Y %m") + "]");
-                    Log.w("SCV", "CENTER [" + currCalendar.getMonth().format("%Y %m") + "]");
-                    Log.w("SCV", "RIGHT  [" + nextCalendar.getMonth().format("%Y %m") + "]");
+                    Log.d("SCV", "LEFT   [" + prevCalendar.getMonth().format("%Y %m") + "]");
+                    Log.d("SCV", "CENTER [" + currCalendar.getMonth().format("%Y %m") + "]");
+                    Log.d("SCV", "RIGHT  [" + nextCalendar.getMonth().format("%Y %m") + "]");
 
                     break;
 
@@ -223,9 +222,9 @@ public class SwitcherCalendarView extends FrameLayout {
                     currCalendar = (CalendarView) centerScreen.getChildAt(0);
                     nextCalendar = (CalendarView) rightScreen.getChildAt(0);
 
-                    Log.w("SCV", "LEFT   [" + prevCalendar.getMonth().format("%Y %m") + "]");
-                    Log.w("SCV", "CENTER [" + currCalendar.getMonth().format("%Y %m") + "]");
-                    Log.w("SCV", "RIGHT  [" + nextCalendar.getMonth().format("%Y %m") + "]");
+                    Log.d("SCV", "LEFT   [" + prevCalendar.getMonth().format("%Y %m") + "]");
+                    Log.d("SCV", "CENTER [" + currCalendar.getMonth().format("%Y %m") + "]");
+                    Log.d("SCV", "RIGHT  [" + nextCalendar.getMonth().format("%Y %m") + "]");
 
                     break;
 
