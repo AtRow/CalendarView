@@ -1,9 +1,9 @@
 package com.examples.android.calendar;
 
 import android.text.format.Time;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
@@ -30,9 +30,9 @@ public class DayTile {
 
     public void setSelected(boolean selected) {
         if (selected) {
-            tileView.setBackgroundResource(R.drawable.item_background_focused);
+            tileView.setBackgroundResource(R.drawable.item_bg_selected);
         } else {
-            tileView.setBackgroundResource(R.drawable.item_background);
+            tileView.setBackgroundResource(R.drawable.item_bg_default);
         }
     }
 
@@ -67,25 +67,39 @@ public class DayTile {
     public void renderTo(ViewGroup tileView) {
 
         this.tileView = tileView;
+        render();
+    }
 
-        TextView dayView = (TextView)tileView.getChildAt(0);
+    public void render() {
+
+        if (tileView == null) {
+            Log.w("DayTile", "Trying to render before assigning TileView, aborting");
+            return;
+        }
+
+        TextView hint = (TextView) tileView.getChildAt(0);
+        TextView dayView = (TextView)tileView.getChildAt(1);
+
         dayView.setText(Integer.toString(time.monthDay));
 
         if(isCurrentDay) {
-            tileView.setBackgroundResource(R.drawable.item_background_focused);
-        }
-        else {
-            tileView.setBackgroundResource(R.drawable.list_item_background);
+            tileView.setBackgroundResource(R.drawable.item_bg_selected);
+
+        } else if (isHoliday()) {
+            tileView.setBackgroundResource(R.drawable.item_bg_holiday);
+
+        } else {
+            tileView.setBackgroundResource(R.drawable.item_bg_default);
         }
 
         // show icon if date is not empty and it exists in the items array
-        //ImageView iw = (ImageView)v.findViewById(R.id.date_icon);
-        ImageView iw = (ImageView) tileView.getChildAt(1);
+        //ImageView hint = (ImageView)v.findViewById(R.id.date_icon);
+
 
         if(dayInfo != null) {
-            iw.setVisibility(View.VISIBLE);
+            hint.setVisibility(View.VISIBLE);
         } else {
-            iw.setVisibility(View.INVISIBLE);
+            hint.setVisibility(View.INVISIBLE);
         }
 
         tileView.setOnClickListener(new View.OnClickListener() {

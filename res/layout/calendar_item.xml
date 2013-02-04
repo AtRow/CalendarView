@@ -1,27 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
-              android:orientation="vertical"
-              android:layout_weight="1"
-    >
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#f9fffd"
+        android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="55"
+        android:id="@+id/textView"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="3dp"
+        android:textSize="12sp"
+        android:background="#ff0000"
+        android:autoText="false"
+        android:textColor="#ffffff"
+        android:layout_gravity="right|center_vertical"
+        android:visibility="visible"/>
 
     <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-              android:id="@+id/date"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
+                  android:id="@+id/date"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
 
-              android:textSize="14sp"
-              android:textStyle="bold"
-              android:textColor="@color/text_color"
-        >
-    </TextView>
-
-    <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
-               android:id="@+id/date_icon"
-               android:layout_width="fill_parent"
-               android:layout_height="fill_parent"
-               android:src="@drawable/icon"
-               android:visibility="visible"/>
+                  android:textSize="18sp"
+                  android:textStyle="bold"
+                  android:textColor="@color/text_color"
+                  android:layout_gravity="center"
+                  android:text="13"
+                  android:paddingLeft="15dp"
+                  android:paddingRight="15dp"
+                  android:paddingTop="5dp"
+                  android:paddingBottom="5dp">
+        </TextView>
 
 </LinearLayout>

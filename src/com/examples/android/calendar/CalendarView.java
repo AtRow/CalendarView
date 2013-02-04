@@ -44,6 +44,7 @@ public class CalendarView extends FrameLayout {
     private Map<Integer, DayInfo> items; // container to store some random calendar items
     private int offset;
     private DayTile[] dayTiles;
+    private DayTile selectedDayTile;
     private LinearLayout container;
 
 
@@ -135,12 +136,12 @@ public class CalendarView extends FrameLayout {
 
     public void setItems(Map<Integer, DayInfo> items) {
 
-        for(int i = 0; i < dayTiles.length; i++){
-            if (items.containsKey(i+1)) {
-                DayInfo info = items.get(i+1);
-                dayTiles[i].dayInfo = info;
-            } else {
-                dayTiles[i].dayInfo = null;
+        for (int day : items.keySet()) {
+            int i = day - 1;
+            if ((i >=0) && (dayTiles != null) && (i < dayTiles.length)) {
+
+                dayTiles[i].dayInfo = items.get(day);
+                dayTiles[i].render();
             }
         }
     }
@@ -150,7 +151,7 @@ public class CalendarView extends FrameLayout {
         @Override
         public void onClick(DayTile dayTile) {
 
-            dayTile.setSelected(true);
+            selectTile(dayTile);
 
             selected = new Time(month);
             selected.monthDay = dayTile.getMonthDay();
@@ -159,6 +160,14 @@ public class CalendarView extends FrameLayout {
             Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
         }
     };
+
+    private void selectTile(DayTile dayTile) {
+        if (selectedDayTile != null) {
+            selectedDayTile.setSelected(false);
+        }
+        dayTile.setSelected(true);
+        selectedDayTile = dayTile;
+    }
 
 
     public View renderDayTileView(ViewGroup tileView, int position) {
