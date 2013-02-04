@@ -20,8 +20,6 @@ public class DayTile {
 
     private final Time time;
 
-    public boolean hasIcon;
-
     private OnClickListener clickListener;
 
     private DayTile self = this;

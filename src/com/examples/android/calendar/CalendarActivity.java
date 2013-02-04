@@ -17,17 +17,74 @@
 package com.examples.android.calendar;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.text.format.Time;
 
 
 public class CalendarActivity extends Activity {
 
 
-	public void onCreate(Bundle savedInstanceState) {
+    private static final String YEAR = "Y";
+    private static final String MONTH = "M";
+    private static final String DAY = "D";
+    private static final int INVALID_VALUE = -1;
+
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Time date = getDateFromIntent(getIntent());
+
         SwitcherCalendarView switcherCalendarView = new SwitcherCalendarView(getApplicationContext());
+        switcherCalendarView.setDate(date);
+        switcherCalendarView.setOnDateSelectedListener(listener);
 
 	    setContentView(switcherCalendarView);
+    }
+
+    private Time getDateFromIntent(Intent intent) {
+        Time date = new Time();
+        date.setToNow();
+        date.hour = 0;
+        date.minute = 0;
+        date.second = 0;
+
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            int year = extras.getInt(YEAR, INVALID_VALUE);
+            int month = extras.getInt(MONTH, INVALID_VALUE);
+            int day = extras.getInt(DAY, INVALID_VALUE);
+
+            if ((year != INVALID_VALUE) &&
+                    (month != INVALID_VALUE) &&
+                    (day != INVALID_VALUE)) {
+
+                date.year = year;
+                date.month = month;
+                date.monthDay = day;
+            }
+        }
+
+        return date;
+    }
+
+    private SwitcherCalendarView.OnDateSelectedListener listener = new SwitcherCalendarView.OnDateSelectedListener() {
+        @Override
+        public void onDateSelected(Time date) {
+            returnDate(date);
+        }
+    };
+
+    private void returnDate(Time date) {
+        Intent intent = new Intent();
+
+        Bundle extras = new Bundle();
+        extras.putInt(YEAR, date.year);
+        extras.putInt(MONTH, date.month);
+        extras.putInt(DAY, date.monthDay);
+
+        intent.putExtras(extras);
+        setResult(RESULT_OK, intent);
+        finish();
     }
 }

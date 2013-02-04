@@ -20,13 +20,9 @@ import android.content.Context;
 import android.text.format.Time;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.GestureDetector;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.View;
+import android.view.*;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 public class SwitcherCalendarView extends FrameLayout {
@@ -49,7 +45,8 @@ public class SwitcherCalendarView extends FrameLayout {
     private TextView title;
 
     private Time selectedDate;
-    private Time currentMonth;
+
+    private OnDateSelectedListener onDateSelectedListener;
 
 
     public SwitcherCalendarView(Context context) {
@@ -60,6 +57,14 @@ public class SwitcherCalendarView extends FrameLayout {
     public SwitcherCalendarView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
+    }
+
+    public static interface OnDateSelectedListener {
+        void onDateSelected(Time date);
+    }
+
+    public void setOnDateSelectedListener(OnDateSelectedListener onDateSelectedListener) {
+        this.onDateSelectedListener = onDateSelectedListener;
     }
 
     private void init() {
@@ -80,7 +85,7 @@ public class SwitcherCalendarView extends FrameLayout {
         Time time = new Time();
         time.setToNow();
 
-        setTime(time);
+        setDate(time);
 
         leftScreen.addView(prevCalendar);
         centerScreen.addView(currCalendar);
@@ -137,7 +142,7 @@ public class SwitcherCalendarView extends FrameLayout {
         });
     }
 
-    public void setTime(Time time) {
+    public void setDate(Time time) {
         Time date = new Time(time);
         date.monthDay = 1;
         date.hour = 0;
@@ -159,8 +164,31 @@ public class SwitcherCalendarView extends FrameLayout {
         selectedDate = new Time(time);
     }
 
+    public Time getSelectedDate() {
+        return selectedDate;
+    }
+
+    private void onSingleClick() {
+
+        int i = pager.getCurrentScreen();
+
+        ViewGroup viewGroup = (ViewGroup) pager.getChildAt(i);
+        CalendarView selectedCalendar = (CalendarView) viewGroup.getChildAt(0);
+
+        selectedDate = selectedCalendar.getDate();
+
+        if (onDateSelectedListener != null) {
+            onDateSelectedListener.onDateSelected(selectedDate);
+        }
+
+//        String day = selectedDate.format("%Y.%m.%d %H:%M:%S");
+//
+//        String msg = "Selected: " + day;
+//        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+    }
+
     private void updateCurrentMonth() {
-        currentMonth = currCalendar.getMonth();
+        Time currentMonth = currCalendar.getMonth();
         title.setText(currentMonth.format("%OB %Y"));
         Log.w("SCV", "Set current month to: " + currentMonth.format("%Y %m"));
     }
@@ -233,21 +261,4 @@ public class SwitcherCalendarView extends FrameLayout {
         }
     };
 
-    private void onSingleClick() {
-
-        Log.e("RVS", "!! onSingleClick");
-
-        int i = pager.getCurrentScreen();
-
-        FrameLayout fl = (FrameLayout) pager.getChildAt(i);
-        CalendarView selectedView = (CalendarView) fl.getChildAt(0);
-
-        //CalendarView selectedView = calendarViews[i];
-        selectedDate = selectedView.getDate();
-
-        String day = selectedDate.format("%Y.%m.%d %H:%M:%S");
-
-        String msg = "Selected: " + day;
-        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
-    }
 }

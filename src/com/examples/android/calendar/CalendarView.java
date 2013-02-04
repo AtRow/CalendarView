@@ -25,7 +25,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import java.util.Map;
 
@@ -156,8 +155,8 @@ public class CalendarView extends FrameLayout {
             selected = new Time(month);
             selected.monthDay = dayTile.getMonthDay();
 
-            String msg = "Selected: " + selected.format("%Y %M %d");
-            Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+//            String msg = "Selected: " + selected.format("%Y %m %d");
+//            Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
         }
     };
 
