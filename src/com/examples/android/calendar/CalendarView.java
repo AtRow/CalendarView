@@ -17,14 +17,15 @@
 package com.examples.android.calendar;
 
 import android.content.Context;
-import android.os.Handler;
 import android.text.format.Time;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import java.util.Map;
 
@@ -40,16 +41,11 @@ public class CalendarView extends FrameLayout {
     private Time month;
     private Time selected;
 
-    //private CalendarGridView gridView;
-
-    private TableLayout tableLayout;
-
-    //private CalendarAdapter adapter;
-    private Handler handler;
     private Map<Integer, DayInfo> items; // container to store some random calendar items
     private int offset;
     private DayTile[] dayTiles;
     private LinearLayout container;
+
 
     public CalendarView(Context context) {
         super(context);
@@ -65,9 +61,6 @@ public class CalendarView extends FrameLayout {
         LayoutInflater li = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         li.inflate(R.layout.calendar_table, this, true);
 
-        //gridView = (CalendarGridView) findViewById(R.id.gridview);
-
-        //tableLayout = (TableLayout) findViewById(R.id.tableLayout);
         container = (LinearLayout) findViewById(R.id.container);
     }
 
@@ -113,52 +106,6 @@ public class CalendarView extends FrameLayout {
         }
     }
 
-    private void fillTable() {
-        int i = 0;
-
-        for (int r = 0; r < ROWS; r++) {
-
-            LinearLayout row = (LinearLayout) container.getChildAt(r);
-
-            for (int c = 0; c < WEEK; c++) {
-
-                ViewGroup day = (ViewGroup) row.getChildAt(c);
-                writeToView(day, i);
-
-                i++;
-            }
-
-            //container.addView(row);
-        }
-    }
-
-/*
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-
-        gridView.setOnChildClickListener(new CalendarGridView.OnChildClickListener() {
-            @Override
-            public void onChildClick(View child) {
-
-                child.setBackgroundResource(R.drawable.item_background_focused);
-
-                TextView date = (TextView) child.findViewById(R.id.date);
-
-                if (date != null && !date.getText().equals("")) {
-                    String msg = "Selected: " + date.getText().toString();
-                    //Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
-
-                    int day = Integer.parseInt(date.getText().toString());
-
-                    selected = new Time(month);
-                    selected.monthDay = day;
-                }
-            }
-        });
-	    
-    }
-*/
 
     public void offsetMonth(int offset) {
 
@@ -169,48 +116,69 @@ public class CalendarView extends FrameLayout {
         }
     }
 
-    public View writeToView(ViewGroup v, int position) {
+    private void fillTable() {
+        int i = 0;
 
-//        LayoutInflater vi = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//        View v = vi.inflate(R.layout.calendar_item, null);
+        for (int r = 0; r < ROWS; r++) {
+
+            LinearLayout row = (LinearLayout) container.getChildAt(r);
+
+            for (int c = 0; c < WEEK; c++) {
+
+                ViewGroup day = (ViewGroup) row.getChildAt(c);
+                renderDayTileView(day, i);
+
+                i++;
+            }
+        }
+    }
+
+    public void setItems(Map<Integer, DayInfo> items) {
+
+        for(int i = 0; i < dayTiles.length; i++){
+            if (items.containsKey(i+1)) {
+                DayInfo info = items.get(i+1);
+                dayTiles[i].dayInfo = info;
+            } else {
+                dayTiles[i].dayInfo = null;
+            }
+        }
+    }
+
+
+    private DayTile.OnClickListener onTileClickListener = new DayTile.OnClickListener() {
+        @Override
+        public void onClick(DayTile dayTile) {
+
+            dayTile.setSelected(true);
+
+            selected = new Time(month);
+            selected.monthDay = dayTile.getMonthDay();
+
+            String msg = "Selected: " + selected.format("%Y %M %d");
+            Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+        }
+    };
+
+
+    public View renderDayTileView(ViewGroup tileView, int position) {
 
         if ((position >= offset) && (position - offset) < dayTiles.length) {
-            TextView dayView;
 
             DayTile tile = dayTiles[position - offset];
 
-            //dayView = (TextView)v.findViewById(R.id.date);
+            tile.setOnClickListener(onTileClickListener);
+            tile.renderTo(tileView);
 
-            dayView = (TextView)v.getChildAt(0);
-            dayView.setText(Integer.toString(tile.getMonthDay()));
-
-            if(tile.isCurrentDay) {
-                v.setBackgroundResource(R.drawable.item_background_focused);
-            }
-            else {
-                v.setBackgroundResource(R.drawable.list_item_background);
-            }
-
-            // show icon if date is not empty and it exists in the items array
-            //ImageView iw = (ImageView)v.findViewById(R.id.date_icon);
-            ImageView iw = (ImageView) v.getChildAt(1);
-
-            if(tile.dayInfo != null) {
-                iw.setVisibility(View.VISIBLE);
-            } else {
-                iw.setVisibility(View.INVISIBLE);
-            }
-
-            // don't forget to show reused view
-            v.setVisibility(View.VISIBLE);
+            // don't forget to show view
+            tileView.setVisibility(View.VISIBLE);
 
         } else {
             // disable empty days from the beginning
-            v.setBackgroundResource(R.drawable.list_item_background);
-            v.setVisibility(View.INVISIBLE);
+            tileView.setVisibility(View.INVISIBLE);
         }
 
-        return v;
+        return tileView;
     }
 
     public void refreshDays() {
